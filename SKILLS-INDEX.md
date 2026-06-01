@@ -26,6 +26,10 @@
   - 位置: `harness/`
   - 描述: 配置长期运行的Agent Harness系统，支持Node.js/Python/Go项目自动检测
 
+- **release** - 通用发布工作流
+  - 位置: `release/`
+  - 描述: 自动检测版本文件和更新日志，支持Node.js、Python、Rust等多语言项目发布
+
 ## 添加新技能
 
 1. 选择合适的分类目录，如果没有则创建新的

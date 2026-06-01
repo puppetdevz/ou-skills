@@ -1,5 +1,5 @@
 ---
-name: release-skills
+name: release
 description: Universal release workflow. Auto-detects version files and changelogs. Supports Node.js, Python, Rust, Claude Plugin, and generic projects. Use when user says "release", "发布", "new version", "bump version", "push", "推送".
 ---
 
@@ -10,12 +10,12 @@ Universal release workflow supporting any project type with multi-language chang
 ## Quick Start
 
 ```bash
-/release-skills              # Auto-detect version bump
-/release-skills 1.1.0        # Specify version directly
-/release-skills --dry-run    # Preview only
-/release-skills --minor      # Force minor bump
-/release-skills --patch      # Force patch bump
-/release-skills --major      # Force major bump (with confirmation)
+/release              # Auto-detect version bump
+/release 1.1.0        # Specify version directly
+/release --dry-run    # Preview only
+/release --minor      # Force minor bump
+/release --patch      # Force patch bump
+/release --major      # Force major bump (with confirmation)
 ```
 
 ## Supported Projects
@@ -43,7 +43,7 @@ Universal release workflow supporting any project type with multi-language chang
 
 ### Step 1: Validate Version / Detect Project Configuration
 
-**If user provides version directly** (e.g., `/release-skills 1.2.0`):
+**If user provides version directly** (e.g., `/release 1.2.0`):
 1. Validate version format matches SemVer (e.g., 1.0.0, 1.2.3, 2.0.0-rc.1)
 2. Use provided version instead of auto-detecting bump
 
