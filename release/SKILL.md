@@ -97,8 +97,11 @@ Read project files to understand current state:
 **Required (if exists)**:
 - `package.json` - Project name, version, description, dependencies
 
-**Optional** (based on project type):
+**Required for README sync** (read and audit):
 - `README.md` / `README.zh.md` - Project introduction, features
+- `SKILLS-INDEX.md` - Skill registry (if exists)
+
+**Optional** (based on project type):
 - `CLAUDE.md` - Architecture, tech stack, development guide
 - `CHANGELOG.md` - Historical version updates
 - `pyproject.toml` / `setup.py` - Python project config
@@ -246,9 +249,57 @@ Release Date: {YYYY-MM-DD}
 Thanks for using {Project Name}!
 ```
 
-### Step 7: Update Project Documentation
+### Step 7: Synchronize README.md (MANDATORY)
 
-**Update CHANGELOG.md** (if exists):
+**Purpose**: Ensure README.md accurately reflects the current project code and structure. This is NOT optional — stale documentation erodes user trust and onboarding experience.
+
+#### 7.1 Audit README.md Against Project Reality
+
+Run the following checks and identify ALL discrepancies:
+
+**A. Directory Structure Check**
+- Read README.md's directory tree section
+- Compare against actual project directories (`find . -maxdepth 2 -type d ! -path './.git/*' ! -path './.idea/*' | sort`)
+- Flag: directories listed in README but missing from project, and vice versa
+
+**B. Skill/Module List Check**
+- If `SKILLS-INDEX.md` exists, extract the current skill list from it
+- Compare against README.md's skill/module descriptions
+- Flag: skills missing from README, stale skill references, wrong paths
+
+**C. Metadata Check**
+- Author/maintainer name: match git config `user.name` or repo owner
+- Repository URL: match `git remote get-url origin`
+- License: match actual LICENSE file content
+- Fork source: match git remote or repo metadata
+
+**D. Feature/Description Check**
+- Each feature/module described in README must have corresponding code
+- Project tagline/description should match package.json or project config
+
+**E. Quick Start / Usage Instructions**
+- Verify commands shown are actually runnable
+- Verify file paths referenced exist in project
+
+#### 7.2 Generate Updated README.md
+
+For each discrepancy found, update README.md to reflect reality:
+
+1. **Update directory tree** to match actual project structure
+2. **Sync skill list** with SKILLS-INDEX.md (if exists) and actual directories
+3. **Fix metadata**: author, repo URL, license, fork info
+4. **Remove stale sections** referencing deleted features/modules
+5. **Add missing sections** for new top-level modules discovered
+6. **Update "last updated" date** to release date
+
+**README.md Content Rules**:
+- Directory tree must use actual directory names (not planned/future ones)
+- Only list skills that have SKILL.md files in their directories
+- Keep the structure consistent with the project's README style
+- Preserve any badges, shields, or status indicators
+
+#### 7.3 Update CHANGELOG.md (if exists)
+
 ```markdown
 ## [{VERSION}] - {YYYY-MM-DD}
 
@@ -271,10 +322,14 @@ Thanks for using {Project Name}!
 - Security fixes (if any)
 ```
 
-**Update README.md** (if needed):
-- Update version badge
-- Update feature list
-- Update changelog link
+#### 7.4 README Sync Verification
+
+After updating README.md, verify:
+- [ ] No stale directory references remain
+- [ ] All mentioned skills exist as SKILL.md files
+- [ ] Author and repo URL are correct
+- [ ] Directory tree is accurate
+- [ ] No placeholder/future content without corresponding code
 
 ### Step 8: Update Version Number
 
@@ -306,13 +361,15 @@ Analyze commits since last tag and group by affected skill/module:
 
 For each skill/module group (in order of changes):
 
-1. **Check README updates needed**
+1. **Check README updates needed** (from Step 7 audit)
 2. **Stage and commit**:
    ```bash
    git add skills/<skill-name>/*
    git add README.md README.zh.md
    git commit -m "<type>(<skill-name>): <meaningful description>"
    ```
+
+**Important**: README.md updates from Step 7 synchronization MUST be included. If the sync revealed discrepancies, update README.md before committing.
 
 ### Step 11: User Confirmation
 
@@ -331,10 +388,11 @@ Before creating the release commit, ask user to confirm:
 
 After user confirmation:
 
-1. **Stage version and changelog files**:
+1. **Stage version, changelog, and README files**:
    ```bash
    git add <version-file>
    git add CHANGELOG*.md
+   git add README.md README.zh.md
    ```
 
 2. **Create release commit**:
@@ -365,6 +423,8 @@ After release, output a checklist for the user:
 ### Documentation
 - [x] Release notes generated
 - [x] CHANGELOG.md updated
+- [x] README.md synchronized with project structure
+- [x] README.md discrepancies fixed (if any found)
 - [x] Version number updated
 
 ### Version Control
@@ -420,9 +480,11 @@ tag:
   prefix: v
   sign: false
 
+# Files always included in release commit for documentation sync
 include:
-  - README.md
-  - package.json
+  - README.md       # Always sync README with project reality
+  - README.zh.md    # Chinese README (if exists)
+  - package.json    # Version file
 ```
 
 ## Dry-Run Mode
@@ -436,6 +498,12 @@ Project detected:
   Version file: package.json (1.2.3)
 
 Proposed version: v1.3.0
+
+README sync audit:
+  ✓ Directory structure: OK
+  ✗ Stale sections: "productivity", "communication"
+  ✗ Missing modules: "harness/", "release/"
+  ✗ Metadata: maintainer mismatch
 
 Changes grouped:
   - feat: add new feature
@@ -452,9 +520,11 @@ No changes made. Run without --dry-run to execute.
 ## Documentation Quality Requirements
 
 ### Content Accuracy
-- Ensure documentation reflects actual functionality
+- **README.md MUST match project reality**: Every directory, skill, feature, and command mentioned must exist
+- No stale/planned/future content in README without corresponding code
 - Keep release notes consistent with main documentation
 - Verify technical stack info matches config files
+- Release process MUST audit and fix README.md discrepancies
 
 ### Markdown Format
 - Empty lines before/after headings (MD022)
